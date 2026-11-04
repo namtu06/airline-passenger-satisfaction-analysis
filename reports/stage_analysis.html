@@ -1,0 +1,1336 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airline Passenger Satisfaction | Stage 1 Report</title>
+
+    <style>
+        :root {
+            --background: #f5f7fa;
+            --surface: #ffffff;
+            --text: #202938;
+            --muted: #64748b;
+            --primary: #174a72;
+            --primary-light: #e8f1f8;
+            --border: #e2e8f0;
+            --positive: #16794b;
+            --warning: #a15c0b;
+            --negative: #b42318;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--background);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.65;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px 70px;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 48px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+        }
+
+        header .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        header h1 {
+            font-size: 34px;
+            line-height: 1.2;
+            margin: 14px 0;
+        }
+
+        header p {
+            max-width: 750px;
+            color: #dce9f2;
+            margin-bottom: 0;
+        }
+
+        .metadata {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            margin-top: 28px;
+            font-size: 13px;
+            color: #dce9f2;
+        }
+
+        section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 23px;
+            margin: 0 0 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h3 {
+            font-size: 17px;
+            margin-top: 26px;
+            margin-bottom: 10px;
+            color: #26384b;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin: 22px 0;
+        }
+
+        .metric {
+            background: var(--primary-light);
+            border-radius: 8px;
+            padding: 18px;
+        }
+
+        .metric .value {
+            display: block;
+            color: var(--primary);
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .metric .label {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .callout {
+            background: #f0f5f9;
+            border-left: 4px solid var(--primary);
+            padding: 16px 18px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning {
+            background: #fff8eb;
+            border-left: 4px solid #d99a36;
+            padding: 16px 18px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0 22px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 600px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #f1f5f9;
+            color: #34465a;
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .number {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .strong {
+            background: #e2f3e9;
+            color: #17643e;
+        }
+
+        .moderate {
+            background: #e8f1f8;
+            color: #174a72;
+        }
+
+        .weak {
+            background: #fff2df;
+            color: #92540b;
+        }
+
+        .negligible {
+            background: #f1f3f5;
+            color: #64748b;
+        }
+
+        ul {
+            padding-left: 22px;
+        }
+
+        li {
+            margin: 7px 0;
+        }
+
+        .conclusion {
+            background: var(--primary);
+            color: white;
+        }
+
+        .conclusion h2 {
+            color: white;
+            border-color: #52728c;
+        }
+
+        .conclusion p,
+        .conclusion li {
+            color: #e5edf4;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+            padding-top: 12px;
+        }
+
+        @media (max-width: 750px) {
+            .container {
+                padding: 20px 12px 40px;
+            }
+
+            header {
+                padding: 30px 24px;
+            }
+
+            header h1 {
+                font-size: 27px;
+            }
+
+            section {
+                padding: 22px 17px;
+            }
+
+            .metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .container {
+                max-width: none;
+                padding: 0;
+            }
+
+            section, header {
+                break-inside: avoid;
+                box-shadow: none;
+            }
+
+            header {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .conclusion {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <!-- HEADER -->
+    <header>
+        <div class="eyebrow">Data Science Project | Stage 1</div>
+
+        <h1>Airline Passenger Satisfaction Analysis</h1>
+
+        <p>
+            Exploring passenger characteristics, service experience and
+            flight operations to identify factors associated with
+            customer satisfaction.
+        </p>
+
+        <div class="metadata">
+            <span>Dataset: Airline Passenger Satisfaction</span>
+            <span>Training observations: 103,904</span>
+            <span>Analysis: Python</span>
+        </div>
+    </header>
+
+    <!-- EXECUTIVE SUMMARY -->
+    <section>
+        <h2>1. Executive Summary</h2>
+
+        <p>
+            This report investigates patterns in airline passenger
+            satisfaction using demographic, travel, service-rating and
+            flight-delay information. The objective is to identify
+            passenger segments and aspects of the travel experience
+            associated with satisfaction.
+        </p>
+
+        <div class="metrics">
+            <div class="metric">
+                <span class="value">103,904</span>
+                <span class="label">Training observations</span>
+            </div>
+
+            <div class="metric">
+                <span class="value">24</span>
+                <span class="label">Original variables</span>
+            </div>
+
+            <div class="metric">
+                <span class="value">43.33%</span>
+                <span class="label">Satisfied passengers</span>
+            </div>
+
+            <div class="metric">
+                <span class="value">56.67%</span>
+                <span class="label">Neutral or dissatisfied</span>
+            </div>
+        </div>
+
+        <h3>Key findings</h3>
+
+        <ul>
+            <li>
+                <strong>Travel characteristics:</strong>
+                Class and type of travel have the strongest categorical
+                associations with satisfaction.
+            </li>
+
+            <li>
+                <strong>Service experience:</strong>
+                Online boarding has the strongest association among
+                the measured service ratings, followed by inflight
+                entertainment, Wi-Fi and seat comfort.
+            </li>
+
+            <li>
+                <strong>Customer loyalty:</strong>
+                Loyal customers have a substantially higher satisfaction
+                rate than disloyal customers.
+            </li>
+
+            <li>
+                <strong>Flight delays:</strong>
+                Delays are associated with satisfaction, but their
+                effect sizes are relatively weak.
+            </li>
+
+            <li>
+                <strong>Gender:</strong>
+                Despite statistical significance, gender has a
+                negligible association with satisfaction.
+            </li>
+        </ul>
+
+        <div class="callout">
+            <strong>Overall interpretation:</strong>
+            Passenger satisfaction is more strongly associated with
+            travel characteristics and reported service experience
+            than with the occurrence or duration of flight delays.
+            These are observational associations, not evidence of
+            causal relationships.
+        </div>
+    </section>
+
+    <!-- OBJECTIVES -->
+    <section>
+        <h2>2. Business Objectives and Research Questions</h2>
+
+        <p>
+            The analysis is guided by the following business question:
+        </p>
+
+        <div class="callout">
+            <strong>
+                Which aspects of the passenger journey are most strongly
+                associated with customer satisfaction, and how can
+                passenger data help an airline identify dissatisfied
+                customers and prioritize service improvements?
+            </strong>
+        </div>
+
+        <h3>Research questions</h3>
+
+        <ol>
+            <li>How is satisfaction distributed across the passenger population?</li>
+            <li>How does satisfaction differ across customer and travel segments?</li>
+            <li>Which service ratings are most strongly associated with satisfaction?</li>
+            <li>How are flight delays related to passenger satisfaction?</li>
+            <li>Which findings could inform customer experience improvements?</li>
+        </ol>
+    </section>
+
+    <!-- DATASET -->
+    <section>
+        <h2>3. Dataset Overview</h2>
+
+        <p>
+            The analysis uses the Airline Passenger Satisfaction dataset
+            published on Kaggle. The supplied training and test files
+            contain 103,904 and 25,976 observations, respectively.
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable group</th>
+                        <th>Examples</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Customer characteristics</td>
+                        <td>Gender, Age, Customer Type</td>
+                        <td>Describe passenger demographics and loyalty</td>
+                    </tr>
+                    <tr>
+                        <td>Travel characteristics</td>
+                        <td>Type of Travel, Class, Flight Distance</td>
+                        <td>Understand travel context and segmentation</td>
+                    </tr>
+                    <tr>
+                        <td>Service ratings</td>
+                        <td>Online boarding, Seat comfort, Wi-Fi, Cleanliness</td>
+                        <td>Evaluate reported service experience</td>
+                    </tr>
+                    <tr>
+                        <td>Flight operations</td>
+                        <td>Departure Delay, Arrival Delay</td>
+                        <td>Investigate operational disruptions</td>
+                    </tr>
+                    <tr>
+                        <td>Target variable</td>
+                        <td>Satisfaction</td>
+                        <td>Measure passenger satisfaction outcome</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            The target variable contains two categories:
+            <strong>satisfied</strong> and
+            <strong>neutral or dissatisfied</strong>.
+            Neutral and dissatisfied passengers are combined in the
+            supplied target, so they cannot be analysed as separate
+            outcomes using this dataset.
+        </p>
+
+        <h3>Initial target distribution</h3>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Target category</th>
+                        <th>Proportion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Neutral or dissatisfied</td>
+                        <td class="number">56.67%</td>
+                    </tr>
+                    <tr>
+                        <td>Satisfied</td>
+                        <td class="number">43.33%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            The target is moderately imbalanced, but not severely so.
+            A majority-class classifier would achieve approximately
+            56.67% accuracy, providing a simple baseline for subsequent
+            predictive modelling.
+        </p>
+    </section>
+
+    <!-- DATA QUALITY -->
+    <section>
+        <h2>4. Data Quality Assessment</h2>
+
+        <h3>Initial inspection</h3>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Check</th>
+                        <th>Result</th>
+                        <th>Assessment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Training dataset shape</td>
+                        <td>103,904 × 24</td>
+                        <td>As expected</td>
+                    </tr>
+                    <tr>
+                        <td>Test dataset shape</td>
+                        <td>25,976 × 24</td>
+                        <td>As expected</td>
+                    </tr>
+                    <tr>
+                        <td>Duplicate rows</td>
+                        <td>0</td>
+                        <td>No duplicates detected</td>
+                    </tr>
+                    <tr>
+                        <td>Missing values</td>
+                        <td>310</td>
+                        <td>Limited to arrival delay</td>
+                    </tr>
+                    <tr>
+                        <td>Other columns</td>
+                        <td>Complete</td>
+                        <td>No missing values detected</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Missing arrival delay values</h3>
+
+        <p>
+            The training dataset contains 310 missing values in
+            <em>Arrival Delay in Minutes</em>, corresponding to
+            approximately 0.30% of observations.
+        </p>
+
+        <p>
+            Passengers with missing arrival delay values have a higher
+            average departure delay than the overall population:
+            37.43 minutes compared with 14.82 minutes. This suggests
+            that missingness may be related to flight circumstances
+            and should not automatically be treated as random.
+        </p>
+
+        <p>
+            The satisfaction distributions are relatively similar:
+            41.29% of passengers with missing arrival delay values are
+            satisfied, compared with 43.34% among passengers with
+            non-missing values.
+        </p>
+
+        <div class="warning">
+            <strong>Handling decision:</strong>
+            Missing arrival delays should not be interpreted as
+            zero-minute delays. Missingness should be preserved or
+            explicitly accounted for during analysis and modelling.
+        </div>
+
+        <h3>Special values and data considerations</h3>
+
+        <ul>
+            <li>
+                <strong>Inflight Wi-Fi:</strong>
+                A rating of 0 represents "Not Applicable", not a
+                dissatisfied rating. Wi-Fi comparisons therefore
+                exclude zero values.
+            </li>
+            <li>
+                <strong>Other service ratings:</strong>
+                Ratings are ordinal values, generally ranging from
+                1 to 5. Zero values should only be excluded if their
+                meaning is established by the data documentation.
+            </li>
+            <li>
+                <strong>Flight delays:</strong>
+                Delay distributions are strongly right-skewed.
+                Extreme values should not automatically be removed,
+                as they may represent genuine operational disruptions.
+            </li>
+            <li>
+                <strong>Identifier:</strong>
+                The ID column is an identifier and should not be
+                used as a predictive feature.
+            </li>
+            <li>
+                <strong>Categories:</strong>
+                Inconsistent capitalization and whitespace should
+                be normalized before further analysis.
+            </li>
+        </ul>
+    </section>
+
+    <!-- EXPLORATORY ANALYSIS -->
+    <section>
+        <h2>5. Exploratory Data Analysis</h2>
+
+        <h3>5.1 Satisfaction across passenger segments</h3>
+
+        <p>
+            Satisfaction rates differ substantially across several
+            passenger characteristics.
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Category</th>
+                        <th>Satisfaction rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Gender</td>
+                        <td>Female</td>
+                        <td>42.74%</td>
+                    </tr>
+                    <tr>
+                        <td>Gender</td>
+                        <td>Male</td>
+                        <td>43.95%</td>
+                    </tr>
+                    <tr>
+                        <td>Customer Type</td>
+                        <td>Loyal customer</td>
+                        <td>47.73%</td>
+                    </tr>
+                    <tr>
+                        <td>Customer Type</td>
+                        <td>Disloyal customer</td>
+                        <td>23.67%</td>
+                    </tr>
+                    <tr>
+                        <td>Type of Travel</td>
+                        <td>Business travel</td>
+                        <td>58.26%</td>
+                    </tr>
+                    <tr>
+                        <td>Type of Travel</td>
+                        <td>Personal travel</td>
+                        <td>10.17%</td>
+                    </tr>
+                    <tr>
+                        <td>Class</td>
+                        <td>Business</td>
+                        <td>69.43%</td>
+                    </tr>
+                    <tr>
+                        <td>Class</td>
+                        <td>Eco</td>
+                        <td>18.61%</td>
+                    </tr>
+                    <tr>
+                        <td>Class</td>
+                        <td>Eco Plus</td>
+                        <td>24.61%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            The largest differences appear across travel purpose and
+            class. Business travellers report substantially higher
+            satisfaction than personal travellers. Business class
+            passengers also report higher satisfaction than passengers
+            travelling in Economy or Eco Plus.
+        </p>
+
+        <div class="warning">
+            <strong>Important qualification:</strong>
+            Travel purpose and class are related. Business travellers
+            are much more likely to fly Business class, while personal
+            travellers predominantly fly Economy. The marginal
+            satisfaction differences should therefore not be interpreted
+            as independent effects.
+        </div>
+
+        <h3>5.2 Service ratings by satisfaction</h3>
+
+        <p>
+            The following table compares average service ratings
+            between satisfied and neutral/dissatisfied passengers.
+            Differences are calculated as:
+        </p>
+
+        <div class="callout">
+            Difference = Mean rating among satisfied passengers
+            − Mean rating among neutral/dissatisfied passengers
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service variable</th>
+                        <th>Neutral / dissatisfied</th>
+                        <th>Satisfied</th>
+                        <th>Difference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Online boarding</td><td>2.656</td><td>4.027</td><td>+1.371</td></tr>
+                    <tr><td>Inflight entertainment</td><td>2.894</td><td>3.965</td><td>+1.071</td></tr>
+                    <tr><td>Seat comfort</td><td>3.036</td><td>3.967</td><td>+0.930</td></tr>
+                    <tr><td>On-board service</td><td>3.019</td><td>3.857</td><td>+0.838</td></tr>
+                    <tr><td>Leg room service</td><td>2.991</td><td>3.822</td><td>+0.831</td></tr>
+                    <tr><td>Cleanliness</td><td>2.936</td><td>3.744</td><td>+0.808</td></tr>
+                    <tr><td>Inflight Wi-Fi*</td><td>2.400</td><td>3.395</td><td>+0.995</td></tr>
+                    <tr><td>Check-in service</td><td>3.043</td><td>3.646</td><td>+0.603</td></tr>
+                    <tr><td>Baggage handling</td><td>3.376</td><td>3.966</td><td>+0.590</td></tr>
+                    <tr><td>Inflight service</td><td>3.389</td><td>3.969</td><td>+0.581</td></tr>
+                    <tr><td>Food and drink</td><td>2.958</td><td>3.521</td><td>+0.563</td></tr>
+                    <tr><td>Ease of online booking</td><td>2.547</td><td>3.032</td><td>+0.485</td></tr>
+                    <tr><td>Gate location</td><td>2.976</td><td>2.978</td><td>+0.002</td></tr>
+                    <tr><td>Departure/arrival time convenience</td><td>3.129</td><td>2.970</td><td>-0.159</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="muted">
+            * Wi-Fi averages exclude zero ratings representing
+            "Not Applicable". Other averages are descriptive summaries
+            of the recorded ratings.
+        </p>
+
+        <p>
+            Online boarding shows the largest difference in average
+            rating. Inflight entertainment and seat comfort also show
+            substantial differences. In contrast, gate location has
+            almost identical average ratings between the groups.
+        </p>
+
+        <h3>5.3 Flight delays</h3>
+
+        <p>
+            Approximately 43.54% of passengers experienced a departure
+            delay, while 43.73% experienced an arrival delay.
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Delay type</th>
+                        <th>Neutral / dissatisfied</th>
+                        <th>Satisfied</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Departure delayed</td>
+                        <td>45.95%</td>
+                        <td>40.38%</td>
+                    </tr>
+                    <tr>
+                        <td>Arrival delayed</td>
+                        <td>47.61%</td>
+                        <td>38.65%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            Passengers in the neutral/dissatisfied group are more likely
+            to experience both departure and arrival delays.
+        </p>
+
+        <p>
+            Among passengers who experienced a delay, median delay
+            durations were also higher for neutral/dissatisfied passengers.
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Delay type</th>
+                        <th>Neutral / dissatisfied median</th>
+                        <th>Satisfied median</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Departure delay</td>
+                        <td>18 minutes</td>
+                        <td>14 minutes</td>
+                    </tr>
+                    <tr>
+                        <td>Arrival delay</td>
+                        <td>18 minutes</td>
+                        <td>15 minutes</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            These findings suggest that both delay occurrence and
+            delay duration are associated with satisfaction. However,
+            the differences in delay duration are modest relative to
+            the variability in the underlying distributions.
+        </p>
+    </section>
+
+    <!-- STATISTICAL TESTING -->
+    <section>
+        <h2>6. Statistical Analysis</h2>
+
+        <p>
+            Hypothesis tests were conducted to assess whether the
+            observed differences between satisfaction groups were
+            statistically significant.
+        </p>
+
+        <h3>6.1 Categorical variables: Chi-square test of independence</h3>
+
+        <p>
+            Chi-square tests were used to evaluate associations between
+            categorical passenger characteristics and satisfaction.
+            Cramér's V was calculated to assess association strength.
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Chi-square</th>
+                        <th>df</th>
+                        <th>p-value</th>
+                        <th>Cramér's V</th>
+                        <th>Effect size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Customer Type</td>
+                        <td>3,657.281</td>
+                        <td>1</td>
+                        <td>&lt; 0.001</td>
+                        <td>0.188</td>
+                        <td><span class="tag moderate">Small</span></td>
+                    </tr>
+                    <tr>
+                        <td>Type of Travel</td>
+                        <td>20,945.234</td>
+                        <td>1</td>
+                        <td>&lt; 0.001</td>
+                        <td>0.449</td>
+                        <td><span class="tag strong">Strong</span></td>
+                    </tr>
+                    <tr>
+                        <td>Class</td>
+                        <td>26,471.863</td>
+                        <td>2</td>
+                        <td>&lt; 0.001</td>
+                        <td>0.505</td>
+                        <td><span class="tag strong">Strong</span></td>
+                    </tr>
+                    <tr>
+                        <td>Gender</td>
+                        <td>15.444</td>
+                        <td>1</td>
+                        <td>0.000085</td>
+                        <td>0.012</td>
+                        <td><span class="tag negligible">Negligible</span></td>
+                    </tr>
+                    <tr>
+                        <td>Departure Delayed</td>
+                        <td>320.923</td>
+                        <td>1</td>
+                        <td>&lt; 0.001</td>
+                        <td>0.056</td>
+                        <td><span class="tag weak">Weak</span></td>
+                    </tr>
+                    <tr>
+                        <td>Arrival Delayed</td>
+                        <td>837.757</td>
+                        <td>1</td>
+                        <td>&lt; 0.001</td>
+                        <td>0.090</td>
+                        <td><span class="tag weak">Weak</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            All six categorical associations remain statistically
+            significant after Holm correction at the 0.05 significance
+            level. However, their practical importance varies considerably.
+        </p>
+
+        <p>
+            Class and type of travel have the largest effect sizes.
+            Customer type has a smaller association, while delay
+            occurrence has weak associations. Gender has a negligible
+            effect despite its statistically significant result.
+        </p>
+
+        <h3>6.2 Service ratings: Mann–Whitney U test</h3>
+
+        <p>
+            The Mann–Whitney U test was used to compare service-rating
+            distributions between satisfied and neutral/dissatisfied
+            passengers. This non-parametric test is suitable for
+            ordinal ratings and does not require normally distributed
+            observations.
+        </p>
+
+        <p>
+            Rank-biserial correlation was used as an effect-size
+            measure. Positive values indicate that satisfied
+            passengers tend to give higher ratings.
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service variable</th>
+                        <th>Rank-biserial correlation</th>
+                        <th>Interpretation</th>
+                        <th>Holm-adjusted result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Online boarding</td>
+                        <td>0.626</td>
+                        <td><span class="tag strong">Strong</span></td>
+                        <td>Significant</td>
+                    </tr>
+                    <tr>
+                        <td>Inflight entertainment</td>
+                        <td>0.454</td>
+                        <td><span class="tag strong">Moderate–strong</span></td>
+                        <td>Significant</td>
+                    </tr>
+                    <tr>
+                        <td>Inflight Wi-Fi</td>
+                        <td>0.425</td>
+                        <td><span class="tag moderate">Moderate</span></td>
+                        <td>Significant</td>
+                    </tr>
+                    <tr>
+                        <td>Seat comfort</td>
+                        <td>0.410</td>
+                        <td><span class="tag moderate">Moderate</span></td>
+                        <td>Significant</td>
+                    </tr>
+                    <tr>
+                        <td>On-board service</td>
+                        <td>0.372</td>
+                        <td><span class="tag moderate">Moderate</span></td>
+                        <td>Significant</td>
+                    </tr>
+                    <tr>
+                        <td>Leg room service</td>
+                        <td>0.362</td>
+                        <td><span class="tag moderate">Moderate</span></td>
+                        <td>Significant</td>
+                    </tr>
+                    <tr>
+                        <td>Cleanliness</td>
+                        <td>0.345</td>
+                        <td><span class="tag moderate">Moderate</span></td>
+                        <td>Significant</td>
+                    </tr>
+                    <tr>
+                        <td>Baggage handling</td>
+                        <td>0.302</td>
+                        <td><span class="tag moderate">Moderate</span></td>
+                        <td>Significant</td>
+                    </tr>
+                    <tr>
+                        <td>Inflight service</td>
+                        <td>0.297</td>
+                        <td><span class="tag moderate">Small–moderate</span></td>
+                        <td>Significant</td>
+                    </tr>
+                    <tr>
+                        <td>Check-in service</td>
+                        <td>0.264</td>
+                        <td><span class="tag moderate">Small–moderate</span></td>
+                        <td>Significant</td>
+                    </tr>
+                    <tr>
+                        <td>Food and drink</td>
+                        <td>0.236</td>
+                        <td><span class="tag moderate">Small–moderate</span></td>
+                        <td>Significant</td>
+                    </tr>
+                    <tr>
+                        <td>Ease of online booking</td>
+                        <td>0.202</td>
+                        <td><span class="tag moderate">Small</span></td>
+                        <td>Significant</td>
+                    </tr>
+                    <tr>
+                        <td>Gate location</td>
+                        <td>-0.0002</td>
+                        <td><span class="tag negligible">Negligible</span></td>
+                        <td>Not significant</td>
+                    </tr>
+                    <tr>
+                        <td>Departure/arrival time convenience</td>
+                        <td>-0.057</td>
+                        <td><span class="tag weak">Weak</span></td>
+                        <td>Significant</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            Thirteen of the fourteen service-rating comparisons remain
+            statistically significant after Holm correction.
+            Gate location is the only variable without a significant
+            difference between the two groups.
+        </p>
+
+        <p>
+            Online boarding stands out with the largest effect size.
+            The result suggests a particularly strong relationship
+            between the reported online boarding experience and
+            passenger satisfaction.
+        </p>
+
+        <h3>6.3 Delay duration: Mann–Whitney U test</h3>
+
+        <p>
+            Delay duration was evaluated separately from delay
+            occurrence. Only passengers with a positive delay were
+            included in each comparison.
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Neutral / dissatisfied N</th>
+                        <th>Median</th>
+                        <th>Satisfied N</th>
+                        <th>Median</th>
+                        <th>Rank-biserial</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Departure delay</td>
+                        <td>27,053</td>
+                        <td>18 min</td>
+                        <td>18,183</td>
+                        <td>14 min</td>
+                        <td>-0.086</td>
+                    </tr>
+                    <tr>
+                        <td>Arrival delay</td>
+                        <td>28,035</td>
+                        <td>18 min</td>
+                        <td>17,400</td>
+                        <td>15 min</td>
+                        <td>-0.087</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            Both comparisons remain statistically significant after
+            Holm correction. The negative rank-biserial values indicate
+            that neutral/dissatisfied passengers tend to experience
+            longer delays than satisfied passengers.
+        </p>
+
+        <p>
+            Nevertheless, the effect sizes are weak. The differences
+            in median delay duration are relatively small compared
+            with the variability in the delay distributions.
+        </p>
+
+        <h3>6.4 Multiple hypothesis testing</h3>
+
+        <p>
+            Holm correction was applied separately to the six
+            categorical tests, fourteen service-rating tests and
+            two delay-duration tests. This controls the family-wise
+            error rate within each group of comparisons.
+        </p>
+
+        <p>
+            The adjusted results preserve the main findings:
+            all categorical tests remain significant, all service
+            comparisons except gate location remain significant,
+            and both delay-duration comparisons remain significant.
+        </p>
+    </section>
+
+    <!-- BUSINESS INTERPRETATION -->
+    <section>
+        <h2>7. Business Interpretation</h2>
+
+        <h3>7.1 Prioritize the digital passenger experience</h3>
+
+        <p>
+            Online boarding has the strongest association with
+            satisfaction among the measured service variables.
+            This suggests that the digital check-in and boarding
+            journey deserves particular attention when investigating
+            passenger experience.
+        </p>
+
+        <h3>7.2 Investigate the onboard experience</h3>
+
+        <p>
+            Inflight entertainment, Wi-Fi, seat comfort, legroom
+            and onboard services show relatively strong associations.
+            These areas could be examined further to identify
+            specific service shortcomings and opportunities for
+            improvement.
+        </p>
+
+        <h3>7.3 Segment customers before interpreting satisfaction</h3>
+
+        <p>
+            Satisfaction varies considerably across travel purpose
+            and class. Comparing passengers within similar travel
+            segments may provide a more useful understanding than
+            examining overall averages alone.
+        </p>
+
+        <h3>7.4 Treat operational delays as one part of the experience</h3>
+
+        <p>
+            Delays are associated with lower satisfaction, but their
+            effect sizes are relatively weak. Operational performance
+            should still be monitored, while considering the broader
+            passenger journey and service experience.
+        </p>
+
+        <div class="warning">
+            These findings are exploratory. They do not establish
+            that changing a particular service will cause satisfaction
+            to increase. Further adjusted analysis and business
+            validation are necessary before prioritizing investments.
+        </div>
+    </section>
+
+    <!-- LIMITATIONS -->
+    <section>
+        <h2>8. Limitations</h2>
+
+        <ul>
+            <li>
+                <strong>Observational data:</strong>
+                Associations cannot establish causal relationships.
+            </li>
+            <li>
+                <strong>Combined target classes:</strong>
+                Neutral and dissatisfied passengers cannot be
+                distinguished in the supplied target variable.
+            </li>
+            <li>
+                <strong>Potential confounding:</strong>
+                Travel purpose and class are related, making
+                independent interpretation difficult without
+                multivariable analysis.
+            </li>
+            <li>
+                <strong>Survey-based ratings:</strong>
+                Service ratings represent reported passenger
+                experience and may be influenced by overall
+                satisfaction itself.
+            </li>
+            <li>
+                <strong>Missing arrival delays:</strong>
+                The 310 missing values may be related to operational
+                circumstances and require careful handling.
+            </li>
+            <li>
+                <strong>Large sample size:</strong>
+                Statistical significance can occur even when
+                practical differences are small. Effect sizes
+                should therefore guide interpretation.
+            </li>
+            <li>
+                <strong>Dataset applicability:</strong>
+                The dataset is not established as representative
+                of Finnair passengers. Findings should not be
+                generalized directly to Finnair.
+            </li>
+        </ul>
+    </section>
+
+    <!-- NEXT STEPS -->
+    <section>
+        <h2>9. Next Steps</h2>
+
+        <p>
+            The exploratory findings provide a foundation for
+            multivariable analysis and predictive modelling.
+            The next stage will investigate whether the observed
+            associations remain informative when multiple
+            passenger characteristics are considered together.
+        </p>
+
+        <ol>
+            <li>
+                <strong>Multivariable analysis:</strong>
+                Investigate the combined relationships between
+                travel purpose, class, customer type and satisfaction.
+            </li>
+            <li>
+                <strong>Baseline predictive model:</strong>
+                Implement logistic regression to estimate passenger
+                satisfaction using customer and flight characteristics.
+            </li>
+            <li>
+                <strong>Model comparison:</strong>
+                Compare the baseline with a tree-based model and
+                evaluate precision, recall, F1-score and ROC-AUC.
+            </li>
+            <li>
+                <strong>Feature interpretation:</strong>
+                Identify which variables contribute most to
+                predictive performance and investigate their
+                relationships with satisfaction.
+            </li>
+            <li>
+                <strong>Business intelligence:</strong>
+                Translate the findings into a Power BI dashboard
+                with passenger segments, satisfaction indicators
+                and actionable recommendations.
+            </li>
+        </ol>
+
+        <div class="callout">
+            <strong>Important modelling distinction:</strong>
+            A model using only passenger and flight characteristics
+            can explore prediction without survey ratings. A second
+            model can include service ratings to assess their
+            additional predictive information. The latter should
+            not be presented as a pre-flight prediction model,
+            because the ratings are collected after the passenger
+            has experienced the service.
+        </div>
+    </section>
+
+    <!-- CONCLUSION -->
+    <section class="conclusion">
+        <h2>10. Conclusion</h2>
+
+        <p>
+            The exploratory and statistical analysis identifies
+            substantial differences in passenger satisfaction
+            across travel characteristics and reported service
+            experiences.
+        </p>
+
+        <p>
+            Class and travel purpose exhibit the strongest
+            categorical associations with satisfaction, while
+            online boarding is the strongest service-rating
+            association. Inflight entertainment, Wi-Fi and seat
+            comfort also demonstrate meaningful differences
+            between satisfaction groups.
+        </p>
+
+        <p>
+            Flight delays are statistically associated with
+            satisfaction, but their effect sizes are relatively
+            weak. Gender, despite statistical significance,
+            shows negligible practical association.
+        </p>
+
+        <p>
+            Overall, the findings suggest that understanding
+            passenger satisfaction requires considering the
+            broader travel context and service experience,
+            rather than focusing exclusively on operational
+            disruptions.
+        </p>
+
+        <p>
+            These results establish a foundation for the next
+            stage: developing predictive models that account
+            for multiple passenger characteristics and
+            translating the findings into business-oriented
+            insights.
+        </p>
+    </section>
+
+    <footer>
+        Airline Passenger Satisfaction Analysis · Stage 1 Report
+        <br>
+        Dataset source:
+        <a href="https://www.kaggle.com/datasets/teejmahal20/airline-passenger-satisfaction"
+           target="_blank" rel="noopener noreferrer">
+            Kaggle – Airline Passenger Satisfaction
+        </a>
+        <br>
+        Prepared as an independent data science portfolio project.
+    </footer>
+
+</div>
+</body>
+</html>
