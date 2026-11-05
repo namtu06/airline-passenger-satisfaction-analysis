@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Stage 2 report: predictive modelling and interpretation for the Airline Passenger Satisfaction project.">
+<title>Airline Passenger Satisfaction — Stage 2: Predictive Modelling</title>
+<style>
+:root{
+  --navy:#14243a;--navy2:#203b5c;--ink:#243247;--muted:#637187;
+  --line:#e2e8f0;--surface:#f5f7fb;--white:#fff;--blue:#2f6fed;
+  --blue-soft:#edf3ff;--green:#16794b;--green-soft:#eaf7f0;
+  --amber:#946200;--amber-soft:#fff6df;--red:#a33b3b;
+  --shadow:0 8px 28px rgba(20,36,58,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--surface);color:var(--ink);font:15px/1.65 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{width:min(1100px,calc(100% - 36px));margin:0 auto}
+.hero{background:linear-gradient(130deg,var(--navy),var(--navy2));color:#fff;padding:54px 0 46px}
+.eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.13em;font-weight:750;color:#b9cbe4}
+h1{font-size:clamp(2rem,4vw,3.25rem);line-height:1.12;letter-spacing:-.035em;margin:12px 0 14px;max-width:820px}
+.subtitle{max-width:760px;color:#d7e2f0;font-size:1.05rem;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:25px}
+.meta span{border:1px solid #ffffff35;border-radius:999px;padding:6px 12px;font-size:.82rem;color:#e7eef8}
+main{padding:30px 0 60px}
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:24px;align-items:start}
+nav{position:sticky;top:18px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+nav strong{display:block;font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px}
+nav a{display:block;text-decoration:none;color:#43536a;padding:6px 0;font-size:.88rem}
+nav a:hover{color:var(--blue)}
+.content{min-width:0}
+section{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:28px;margin-bottom:20px;box-shadow:var(--shadow);scroll-margin-top:20px}
+h2{font-size:1.42rem;line-height:1.25;letter-spacing:-.02em;margin:0 0 16px;color:var(--navy)}
+h3{font-size:1.04rem;margin:24px 0 9px;color:var(--navy)}
+p{margin:9px 0}
+.lead{font-size:1.04rem;color:#40516a}
+.small{font-size:.86rem;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+.metric{background:#f8faff;border:1px solid #e4ebf6;border-radius:12px;padding:15px}
+.metric .value{font-size:1.65rem;font-weight:800;letter-spacing:-.04em;color:var(--navy);line-height:1.2}
+.metric .label{font-size:.8rem;color:var(--muted);margin-top:5px}
+.callout{border-left:4px solid var(--blue);background:var(--blue-soft);padding:14px 16px;border-radius:8px;margin:16px 0}
+.callout.success{border-color:var(--green);background:var(--green-soft)}
+.callout.warn{border-color:#d49a21;background:var(--amber-soft)}
+table{border-collapse:collapse;width:100%;margin:14px 0 8px;font-size:.9rem}
+th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:#f5f7fb;color:#43536a;font-weight:700}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.table-wrap{overflow-x:auto}
+.tag{display:inline-block;padding:3px 9px;border-radius:999px;font-size:.75rem;font-weight:700;background:#eef2f7;color:#506078}
+.tag.green{background:var(--green-soft);color:var(--green)}
+.tag.blue{background:var(--blue-soft);color:#2857b7}
+ul,ol{padding-left:22px}
+li{margin:6px 0}
+code{background:#f0f3f8;padding:2px 5px;border-radius:4px;font-size:.88em}
+.kicker{font-size:.78rem;font-weight:750;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:8px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.note{font-size:.84rem;color:var(--muted)}
+footer{padding:24px 0 42px;color:var(--muted);font-size:.84rem}
+hr{border:0;border-top:1px solid var(--line);margin:22px 0}
+@media(max-width:850px){.layout{grid-template-columns:1fr}nav{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 14px}nav strong{grid-column:1/-1}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.wrap{width:min(100% - 22px,1100px)}.hero{padding:38px 0 34px}section{padding:20px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.two-col{grid-template-columns:1fr}nav{grid-template-columns:1fr 1fr}table{font-size:.82rem}th,td{padding:8px}}
+@media print{
+ body{background:#fff;font-size:10pt}.hero{padding:24px 0;background:var(--navy)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .wrap{width:100%}main{padding:12px 0}.layout{display:block}nav{display:none}
+ section{box-shadow:none;break-inside:avoid;border:1px solid #ccd4df;padding:18px;margin-bottom:12px}
+ .grid{grid-template-columns:repeat(4,1fr)}a{color:inherit;text-decoration:none}
+ footer{padding:12px 0}.table-wrap{overflow:visible}
+}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Airline Passenger Satisfaction · Data Science Project</div>
+    <h1>Stage 2 — Predictive Modelling &amp; Interpretation</h1>
+    <p class="subtitle">Comparing Logistic Regression and Random Forest models to classify passenger satisfaction, evaluate the value of service-experience ratings, and translate model behaviour into business-relevant findings.</p>
+    <div class="meta">
+      <span>Stage 2 of 3</span><span>Python · scikit-learn</span><span>Validation + held-out test evaluation</span><span>5 November 2026</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<div class="layout">
+<nav aria-label="Report contents">
+  <strong>Contents</strong>
+  <a href="#summary">Executive Summary</a>
+  <a href="#objective">Objective &amp; Questions</a>
+  <a href="#data">Data &amp; Feature Design</a>
+  <a href="#method">Methodology</a>
+  <a href="#validation">Validation Results</a>
+  <a href="#test">Final Test Results</a>
+  <a href="#importance">Feature Importance</a>
+  <a href="#business">Business Interpretation</a>
+  <a href="#limitations">Limitations</a>
+  <a href="#conclusion">Conclusion &amp; Next Steps</a>
+</nav>
+
+<div class="content">
+<section id="summary">
+  <div class="kicker">01 · Executive Summary</div>
+  <h2>Key findings</h2>
+  <p class="lead">Regularized Random Forest Model B achieved the strongest held-out test performance, with 95.95% accuracy, 0.9936 ROC-AUC and 0.9588 macro F1. Adding service-experience ratings substantially improved classification compared with the characteristics-and-flight-information feature set.</p>
+  <div class="grid">
+    <div class="metric"><div class="value">95.95%</div><div class="label">Best test accuracy</div></div>
+    <div class="metric"><div class="value">0.9936</div><div class="label">Best test ROC-AUC</div></div>
+    <div class="metric"><div class="value">0.9588</div><div class="label">Best test macro F1</div></div>
+    <div class="metric"><div class="value">97%</div><div class="label">Recall for neutral/dissatisfied class</div></div>
+  </div>
+  <div class="callout success"><strong>Primary candidate:</strong> Regularized Random Forest Model B. It uses passenger/travel characteristics, flight information, Wi-Fi information and 13 additional service ratings.</div>
+  <ul>
+    <li>Random Forest outperformed Logistic Regression with both feature sets.</li>
+    <li>Adding the 13 additional service ratings increased Random Forest test accuracy from 87.71% to 95.95%.</li>
+    <li>Validation and test metrics were closely aligned, supporting consistent performance on the held-out split.</li>
+    <li>Type of Travel, Wi-Fi rating, Customer Type and Wi-Fi applicability were among the most important Model B predictors under permutation importance.</li>
+  </ul>
+</section>
+
+<section id="objective">
+  <div class="kicker">02 · Objective &amp; Research Questions</div>
+  <h2>From descriptive analysis to predictive modelling</h2>
+  <p>The purpose of Stage 2 was to build and evaluate models that classify whether a passenger is <strong>neutral or dissatisfied</strong> or <strong>satisfied</strong>, and to assess how much additional predictive information is available from service-experience ratings.</p>
+  <h3>Research questions</h3>
+  <ol>
+    <li>How accurately can passenger satisfaction be classified using passenger and flight information?</li>
+    <li>How much does adding service-experience ratings improve predictive performance?</li>
+    <li>Does a non-linear model (Random Forest) outperform a linear baseline (Logistic Regression)?</li>
+    <li>Which input features does the best-performing model rely on most?</li>
+  </ol>
+  <p class="small">The target was encoded as 0 = neutral or dissatisfied and 1 = satisfied. The analysis is predictive and observational; it does not estimate causal effects.</p>
+</section>
+
+<section id="data">
+  <div class="kicker">03 · Data &amp; Feature Design</div>
+  <h2>Dataset and modelling split</h2>
+  <div class="grid">
+    <div class="metric"><div class="value">103,904</div><div class="label">Rows in original Kaggle training set</div></div>
+    <div class="metric"><div class="value">25,976</div><div class="label">Rows in original Kaggle test set</div></div>
+    <div class="metric"><div class="value">20,781</div><div class="label">Internal validation rows</div></div>
+    <div class="metric"><div class="value">42</div><div class="label">Random state for split</div></div>
+  </div>
+  <p>The official Kaggle training set was divided into an 80% model-training subset and a 20% validation subset using stratification and <code>random_state=42</code>. The original Kaggle test set was kept separate until final evaluation.</p>
+  <h3>Two feature sets</h3>
+  <div class="two-col">
+    <div class="callout">
+      <strong>Model A — baseline feature set</strong>
+      <p>Passenger and travel characteristics, flight information, and Wi-Fi information.</p>
+      <p class="small">Includes gender, customer type, age, type of travel, class, flight distance, delays, Wi-Fi rating and Wi-Fi applicability.</p>
+    </div>
+    <div class="callout">
+      <strong>Model B — expanded feature set</strong>
+      <p>All Model A features plus 13 additional service-experience ratings.</p>
+      <p class="small">Includes online boarding, check-in, baggage handling, seat comfort, inflight entertainment, food and drink, and other service ratings.</p>
+    </div>
+  </div>
+  <div class="callout warn"><strong>Feature-set clarification:</strong> Wi-Fi rating is itself a service-experience measure, but it was retained in Model A in the implemented workflow. Therefore, Model A is not a strictly pre-experience or service-rating-free model. Model B adds the other 13 service ratings.</div>
+  <h3>Feature preparation</h3>
+  <ul>
+    <li>The passenger ID was excluded from modelling.</li>
+    <li>Wi-Fi value 0 represented “Not Applicable”; it was separated into <code>wifi_rating_applicable</code> and <code>wifi_rating</code>, with non-applicable ratings treated as missing.</li>
+    <li>Missing arrival-delay values were median-imputed, with a missingness indicator retained.</li>
+    <li>Imputation and encoding were fitted within scikit-learn pipelines to avoid fitting preprocessing on validation or test observations.</li>
+  </ul>
+</section>
+
+<section id="method">
+  <div class="kicker">04 · Methodology</div>
+  <h2>Models and evaluation strategy</h2>
+  <h3>Logistic Regression</h3>
+  <p>Logistic Regression was used as the baseline classifier. Numerical variables were median-imputed and standardised; categorical variables were imputed and one-hot encoded with a reference category dropped.</p>
+  <h3>Random Forest</h3>
+  <p>Random Forest was used to capture non-linear patterns and feature interactions. Scaling was not required for tree-based models. Categorical variables were one-hot encoded without dropping a reference category.</p>
+  <h3>Overfitting control</h3>
+  <p>The initial Random Forest models fitted the training data almost perfectly, indicating overfitting. Constrained versions were trained with:</p>
+  <table>
+    <thead><tr><th>Parameter</th><th class="num">Value</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>n_estimators</code></td><td class="num">300</td><td>Number of trees</td></tr>
+      <tr><td><code>max_features</code></td><td class="num">sqrt</td><td>Features considered at each split</td></tr>
+      <tr><td><code>max_depth</code></td><td class="num">20</td><td>Limits tree depth</td></tr>
+      <tr><td><code>min_samples_split</code></td><td class="num">10</td><td>Requires more samples to split a node</td></tr>
+      <tr><td><code>min_samples_leaf</code></td><td class="num">5</td><td>Prevents very small terminal leaves</td></tr>
+      <tr><td><code>random_state</code></td><td class="num">42</td><td>Reproducibility</td></tr>
+    </tbody>
+  </table>
+  <h3>Evaluation metrics</h3>
+  <ul>
+    <li><strong>Accuracy:</strong> overall proportion of correct classifications.</li>
+    <li><strong>ROC-AUC:</strong> ability to rank positive cases above negative cases across classification thresholds.</li>
+    <li><strong>Macro F1:</strong> unweighted average of the F1 scores for both classes.</li>
+    <li><strong>Precision and recall:</strong> assessed separately for neutral/dissatisfied and satisfied passengers.</li>
+    <li><strong>Confusion matrix:</strong> shows correct and incorrect classifications by class.</li>
+  </ul>
+</section>
+
+<section id="validation">
+  <div class="kicker">05 · Validation Results</div>
+  <h2>Model comparison on the validation set</h2>
+  <p>All four model variants were evaluated on the same 20% stratified validation subset.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Model</th><th class="num">Accuracy</th><th class="num">ROC-AUC</th><th class="num">Macro F1</th></tr></thead>
+    <tbody>
+      <tr><td>Logistic Regression A</td><td class="num">81.59%</td><td class="num">0.9164</td><td class="num">~0.81</td></tr>
+      <tr><td>Logistic Regression B</td><td class="num">90.17%</td><td class="num">0.9646</td><td class="num">~0.90</td></tr>
+      <tr><td>Regularized Random Forest A</td><td class="num">87.88%</td><td class="num">0.9497</td><td class="num">0.8780</td></tr>
+      <tr><td><strong>Regularized Random Forest B</strong></td><td class="num"><strong>96.05%</strong></td><td class="num"><strong>0.9939</strong></td><td class="num"><strong>0.9597</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">Logistic Regression macro F1 values are shown approximately because the exact values were not separately recorded in the project results. The validation classification reports rounded both models' macro F1 to approximately 0.81 and 0.90.</p>
+  <h3>Regularized Random Forest — validation classification</h3>
+  <div class="two-col">
+    <div>
+      <strong>Model A</strong>
+      <table><thead><tr><th>Class</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1</th></tr></thead>
+      <tbody><tr><td>0</td><td class="num">0.93</td><td class="num">0.85</td><td class="num">0.89</td></tr><tr><td>1</td><td class="num">0.82</td><td class="num">0.92</td><td class="num">0.87</td></tr></tbody></table>
+      <p class="small">Confusion matrix: [[10,004, 1,772], [746, 8,259]]</p>
+    </div>
+    <div>
+      <strong>Model B</strong>
+      <table><thead><tr><th>Class</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1</th></tr></thead>
+      <tbody><tr><td>0</td><td class="num">0.96</td><td class="num">0.97</td><td class="num">0.97</td></tr><tr><td>1</td><td class="num">0.96</td><td class="num">0.94</td><td class="num">0.95</td></tr></tbody></table>
+      <p class="small">Confusion matrix: [[11,456, 320], [501, 8,504]]</p>
+    </div>
+  </div>
+  <h3>Training versus validation performance after regularization</h3>
+  <table>
+    <thead><tr><th>Model</th><th></th><th class="num">Accuracy</th><th class="num">ROC-AUC</th><th class="num">Macro F1</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="2">Random Forest A</td><td>Training</td><td class="num">0.8990</td><td class="num">0.9709</td><td class="num">0.8983</td></tr>
+      <tr><td>Validation</td><td class="num">0.8788</td><td class="num">0.9497</td><td class="num">0.8780</td></tr>
+      <tr><td rowspan="2">Random Forest B</td><td>Training</td><td class="num">0.9720</td><td class="num">0.9978</td><td class="num">0.9714</td></tr>
+      <tr><td>Validation</td><td class="num">0.9605</td><td class="num">0.9939</td><td class="num">0.9597</td></tr>
+    </tbody>
+  </table>
+  <p class="small">Regularization substantially reduced the training-validation gap compared with the initial unconstrained forests. The original forests reached near-perfect training scores, while validation accuracy was 86.04% for Model A and 96.28% for Model B.</p>
+</section>
+
+<section id="test">
+  <div class="kicker">06 · Final Held-Out Test Results</div>
+  <h2>Evaluation on the original Kaggle test set</h2>
+  <p>The original Kaggle test set (25,976 rows) was evaluated only after model development and validation. These results provide the final reported performance for this project split.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Model</th><th class="num">Accuracy</th><th class="num">ROC-AUC</th><th class="num">Macro F1</th></tr></thead>
+    <tbody>
+      <tr><td>Logistic Regression A</td><td class="num">80.89%</td><td class="num">0.9120</td><td class="num">0.8050</td></tr>
+      <tr><td>Logistic Regression B</td><td class="num">90.14%</td><td class="num">0.9638</td><td class="num">0.8999</td></tr>
+      <tr><td>Regularized Random Forest A</td><td class="num">87.71%</td><td class="num">0.9484</td><td class="num">0.8764</td></tr>
+      <tr><td><strong>Regularized Random Forest B</strong></td><td class="num"><strong>95.95%</strong></td><td class="num"><strong>0.9936</strong></td><td class="num"><strong>0.9588</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout success"><strong>Selected primary candidate — Regularized Random Forest B.</strong> It achieved the highest test accuracy, ROC-AUC and macro F1 among the four evaluated models.</div>
+  <h3>Best model — test classification report</h3>
+  <table>
+    <thead><tr><th>Class</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1-score</th><th class="num">Support</th></tr></thead>
+    <tbody>
+      <tr><td>0 — Neutral or dissatisfied</td><td class="num">0.96</td><td class="num">0.97</td><td class="num">0.96</td><td class="num">14,573</td></tr>
+      <tr><td>1 — Satisfied</td><td class="num">0.96</td><td class="num">0.94</td><td class="num">0.95</td><td class="num">11,403</td></tr>
+    </tbody>
+  </table>
+  <h3>Best model — test confusion matrix</h3>
+  <table>
+    <thead><tr><th>Actual / Predicted</th><th class="num">Neutral / dissatisfied</th><th class="num">Satisfied</th></tr></thead>
+    <tbody><tr><th>Neutral / dissatisfied</th><td class="num">14,172</td><td class="num">401</td></tr><tr><th>Satisfied</th><td class="num">651</td><td class="num">10,752</td></tr></tbody>
+  </table>
+  <p>Of the 14,573 neutral/dissatisfied passengers in the test set, the model correctly classified 14,172 and missed 401. Of the 11,403 satisfied passengers, it correctly classified 10,752.</p>
+  <h3>Validation-to-test consistency</h3>
+  <table>
+    <thead><tr><th>Model</th><th class="num">Validation accuracy</th><th class="num">Test accuracy</th><th class="num">Change</th></tr></thead>
+    <tbody>
+      <tr><td>Logistic Regression A</td><td class="num">81.59%</td><td class="num">80.89%</td><td class="num">−0.70 pp</td></tr>
+      <tr><td>Logistic Regression B</td><td class="num">90.17%</td><td class="num">90.14%</td><td class="num">−0.03 pp</td></tr>
+      <tr><td>Regularized Random Forest A</td><td class="num">87.88%</td><td class="num">87.71%</td><td class="num">−0.17 pp</td></tr>
+      <tr><td>Regularized Random Forest B</td><td class="num">96.05%</td><td class="num">95.95%</td><td class="num">−0.10 pp</td></tr>
+    </tbody>
+  </table>
+  <p class="small">The small validation-to-test differences indicate consistent performance across the two held-out subsets from this dataset. They do not establish generalisation to other airlines, populations or time periods.</p>
+</section>
+
+<section id="importance">
+  <div class="kicker">07 · Model Interpretation</div>
+  <h2>Permutation feature importance</h2>
+  <p>Permutation importance was calculated on the validation set using macro F1 as the scoring metric and five repeats. A feature's importance is the mean decrease in macro F1 after randomly shuffling that feature. Larger values indicate greater reliance by the fitted model.</p>
+  <h3>Model B — strongest features</h3>
+  <table>
+    <thead><tr><th>Rank</th><th>Feature</th><th class="num">Importance</th><th class="num">Std</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Type of Travel</td><td class="num">0.149947</td><td class="num">0.001523</td></tr>
+      <tr><td>2</td><td>Wi-Fi rating</td><td class="num">0.091808</td><td class="num">0.001357</td></tr>
+      <tr><td>3</td><td>Customer Type</td><td class="num">0.063590</td><td class="num">0.000804</td></tr>
+      <tr><td>4</td><td>Wi-Fi applicability</td><td class="num">0.032905</td><td class="num">0.000259</td></tr>
+      <tr><td>5</td><td>Online boarding</td><td class="num">0.030352</td><td class="num">0.001212</td></tr>
+      <tr><td>6</td><td>Check-in service</td><td class="num">0.022924</td><td class="num">0.000398</td></tr>
+      <tr><td>7</td><td>Class</td><td class="num">0.018754</td><td class="num">0.000953</td></tr>
+      <tr><td>8</td><td>Baggage handling</td><td class="num">0.017520</td><td class="num">0.000335</td></tr>
+      <tr><td>9</td><td>Seat comfort</td><td class="num">0.012052</td><td class="num">0.000313</td></tr>
+      <tr><td>10</td><td>Inflight service</td><td class="num">0.011726</td><td class="num">0.000815</td></tr>
+    </tbody>
+  </table>
+  <h3>Model A — features used by the model</h3>
+  <table>
+    <thead><tr><th>Rank</th><th>Feature</th><th class="num">Importance</th><th class="num">Std</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Wi-Fi rating</td><td class="num">0.122520</td><td class="num">0.002650</td></tr>
+      <tr><td>2</td><td>Class</td><td class="num">0.082998</td><td class="num">0.002152</td></tr>
+      <tr><td>3</td><td>Type of Travel</td><td class="num">0.079392</td><td class="num">0.001778</td></tr>
+      <tr><td>4</td><td>Customer Type</td><td class="num">0.054350</td><td class="num">0.000811</td></tr>
+      <tr><td>5</td><td>Wi-Fi applicability</td><td class="num">0.029826</td><td class="num">0.000379</td></tr>
+      <tr><td>6</td><td>Age</td><td class="num">0.022395</td><td class="num">0.000481</td></tr>
+      <tr><td>7</td><td>Arrival delay</td><td class="num">0.003693</td><td class="num">0.000712</td></tr>
+      <tr><td>8</td><td>Flight distance</td><td class="num">0.001934</td><td class="num">0.000680</td></tr>
+      <tr><td>9</td><td>Gender</td><td class="num">−0.000084</td><td class="num">0.000441</td></tr>
+      <tr><td>10</td><td>Departure delay</td><td class="num">−0.000467</td><td class="num">0.000414</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn"><strong>Interpretation note:</strong> The Model A permutation run was applied to the full validation dataframe, although Model A's pipeline ignores the 13 additional service-rating columns. Their reported zero values are therefore not evidence that Model A evaluated or rejected those features. The table above lists only features actually used by Model A.</div>
+  <h3>Interpretation</h3>
+  <ul>
+    <li><strong>Type of Travel</strong> was the strongest Model B predictor, indicating that business versus personal travel carries substantial information for classification.</li>
+    <li><strong>Wi-Fi rating and applicability</strong> were important in both models, showing that Wi-Fi-related information contributes strongly to predictions in this dataset.</li>
+    <li><strong>Customer Type</strong> ranked highly, consistent with the Stage 1 finding that loyal and disloyal customers had different satisfaction rates.</li>
+    <li><strong>Online boarding and check-in service</strong> were among the most important additional service ratings.</li>
+    <li><strong>Flight delays and gender</strong> had very low individual permutation importance in these models.</li>
+  </ul>
+  <p class="small">Permutation importance measures predictive reliance, not direction of association or causation. Correlated or overlapping features can share predictive information, which may reduce the apparent individual importance of each feature. Small negative values can occur from evaluation variability and should be interpreted as approximately zero importance.</p>
+</section>
+
+<section id="business">
+  <div class="kicker">08 · Business Interpretation</div>
+  <h2>Potential implications for an airline</h2>
+  <p>The findings can inform how an airline segments passenger experience and analyses satisfaction. They should be treated as hypotheses and decision-support insights, not as proof that a particular intervention will cause satisfaction to improve.</p>
+  <div class="two-col">
+    <div>
+      <h3>Segment the passenger journey</h3>
+      <p>Travel purpose and customer type were highly informative. An airline could examine whether business and personal travellers have different expectations and service priorities.</p>
+    </div>
+    <div>
+      <h3>Monitor digital touchpoints</h3>
+      <p>Wi-Fi, online boarding and check-in appeared among the important predictors. These are practical areas for more detailed service-quality monitoring.</p>
+    </div>
+    <div>
+      <h3>Use service feedback to identify risk</h3>
+      <p>Where survey ratings are available, a model like Model B could help flag responses associated with neutral or dissatisfied experiences for follow-up analysis.</p>
+    </div>
+    <div>
+      <h3>Investigate delays in context</h3>
+      <p>Delays had relatively low predictive importance compared with several experience and passenger variables. This does not mean delays are operationally unimportant; their effects may be context-dependent or captured partly by other variables.</p>
+    </div>
+  </div>
+  <div class="callout"><strong>Operational distinction:</strong> Model B is a post-experience classification model because it uses service ratings collected during or after the journey. It should not be presented as a pre-flight early-warning model. Model A also includes Wi-Fi rating and flight-delay information, so it is not strictly a pre-flight model either.</div>
+</section>
+
+<section id="limitations">
+  <div class="kicker">09 · Limitations</div>
+  <h2>What this analysis does not establish</h2>
+  <ol>
+    <li><strong>Dataset transferability:</strong> the analysis uses a public Kaggle dataset, not Finnair or another airline's operational data. Results may not transfer to another carrier, route network or customer population.</li>
+    <li><strong>Post-experience features:</strong> Model B uses service ratings that may only be available after passengers have experienced the service. Its strong classification performance does not imply that satisfaction can be predicted before the journey.</li>
+    <li><strong>Association is not causation:</strong> feature importance does not show that changing a feature will cause satisfaction to change.</li>
+    <li><strong>Single held-out split:</strong> validation and test data are from the same source dataset and split structure. External or temporal validation would be needed to assess broader generalisation.</li>
+    <li><strong>Correlated predictors:</strong> permutation importance can understate the individual importance of correlated features because other variables may carry overlapping information.</li>
+    <li><strong>Model complexity:</strong> Random Forest is less directly interpretable than Logistic Regression. The feature-importance analysis offers a global view but does not explain every individual prediction.</li>
+    <li><strong>Classification threshold:</strong> reported class metrics use the classifier's default decision threshold. Different operational costs for false positives and false negatives could justify a separate threshold analysis.</li>
+  </ol>
+</section>
+
+<section id="conclusion">
+  <div class="kicker">10 · Conclusion &amp; Next Steps</div>
+  <h2>Stage 2 conclusion</h2>
+  <p class="lead">Across the four evaluated model variants, Regularized Random Forest Model B achieved the strongest held-out test performance (95.95% accuracy, 0.9936 ROC-AUC and 0.9588 macro F1). The result was consistent with validation performance and substantially exceeded the corresponding Model A result.</p>
+  <p>The comparison indicates that the 13 additional service ratings provide substantial predictive information beyond the passenger, travel, flight and Wi-Fi features already included in Model A. The strongest Model B permutation-importance features were Type of Travel, Wi-Fi rating, Customer Type, Wi-Fi applicability and Online boarding.</p>
+  <div class="callout success"><strong>Model selection:</strong> retain Regularized Random Forest B as the primary predictive candidate and Regularized Random Forest A as a comparison model for settings where the additional 13 service ratings are unavailable.</div>
+  <h3>Next stage — Business dashboard</h3>
+  <ol>
+    <li><strong>Executive overview:</strong> headline satisfaction metrics, passenger segments and key findings.</li>
+    <li><strong>Passenger experience:</strong> service-rating patterns and satisfaction differences across passenger groups.</li>
+    <li><strong>Predictive insights:</strong> model comparison, key predictors and appropriate use cases and limitations.</li>
+  </ol>
+  <p class="small">The Power BI dashboard will bring together the descriptive and statistical findings from Stage 1 with the predictive findings from Stage 2. It should prioritise clear business communication over displaying every technical analysis.</p>
+</section>
+
+<footer>
+  <p><strong>Project:</strong> Airline Passenger Satisfaction — Stage 2: Predictive Modelling &amp; Interpretation.</p>
+  <p><strong>Dataset source:</strong> Kaggle, Airline Passenger Satisfaction dataset. This report describes an independent analysis of the public dataset; it is not an analysis of any airline's proprietary customer data.</p>
+  <p>Prepared 5 November 2026 · Python, pandas and scikit-learn.</p>
+  <p>Report webpage generated with ChatGPT.</p>
+</footer>
+</div>
+</div>
+</main>
+</body>
+</html>
