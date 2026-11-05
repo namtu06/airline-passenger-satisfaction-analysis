@@ -23,6 +23,10 @@ The project combines exploratory data analysis, statistical testing, predictive 
 - Statistical testing to evaluate differences between passenger segments and satisfaction groups.
 - Assessment of effect sizes to distinguish practically meaningful relationships from statistical significance.
 
+A more detailed report can be found in `reports/stage_1_analysis.html`
+
+<img src="src/airline-analysis.png"  width="400"/>
+
 ### 2. Predictive Modelling & Model Interpretation
 
 - Development of Logistic Regression and Random Forest classifiers.
@@ -40,6 +44,8 @@ The project combines exploratory data analysis, statistical testing, predictive 
 
 Model B incorporates service ratings collected after the passenger experience. Its performance therefore reflects classification using experience-related information, rather than purely pre-flight prediction.
 
+A more detailed report can be found in `reports/stage_1_analysis.html`
+
 ### 3. Business Intelligence & Recommendations
 
 - Development of an interactive Power BI dashboard.
@@ -47,6 +53,10 @@ Model B incorporates service ratings collected after the passenger experience. I
 - Exploration of service-rating distributions and their relationship with satisfaction.
 - Investigation of departure-delay patterns.
 - Communication of key findings and potential areas for service improvement.
+
+Final Power BI Dashboard can be found in `dashboard/Final_Dashboard.pbix`
+
+<img src="src/airline-dashboard.png"  width="400"/>
 
 ## Key Findings
 
